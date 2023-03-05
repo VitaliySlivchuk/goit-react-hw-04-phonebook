@@ -1,0 +1,63 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #333;
+  width: 400px;
+  height: auto;
+  padding: 20px;
+  gap: 30px;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: auto;
+}
+.button {
+  width: 200px;
+  height: 40px;
+}
+
+.contactsWrap {
+  display: flex;
+  flex-direction: column;
+
+  border: 2px solid #333;
+  width: 400px;
+  height: auto;
+  padding: 20px;
+  gap: 30px;
+}
+.contacts {
+  display: flex;
+  flex-direction: column;
+}
+.input {
+  width: 200px;
+  height: auto;
+}
+.ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.itembtn {
+  margin-left: 40px;
+}
+.wrapitem {
+  width: 400px;
+}
+.liitem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
