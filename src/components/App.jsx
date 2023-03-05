@@ -1,9 +1,10 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 
 import { Form } from './Form/Form';
 import { Filter } from './Filter/Filter';
 import { ContactList } from './ContactList/ContactList';
+import { load } from '../utils/storage';
 
 import css from './Form/Form.module.css';
 
@@ -14,84 +15,60 @@ const contactsJSON = [
   { id: nanoid(), name: 'Annie Copeland', number: '227-91-26' },
 ];
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(load('contacts') || []);
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
+  useEffect(() => {
     const contacts = localStorage.getItem('contacts');
     const parseContacts = JSON.parse(contacts);
-
-    if (parseContacts !== null) {
-      this.setState({ contacts: parseContacts });
-      return;
+    if (parseContacts === null) {
+      setContacts(contactsJSON);
     }
-    this.setState({ contacts: contactsJSON });
-  }
+  }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  fromSubmit = data => {
-    const searchSameName = this.state.contacts
-      .map(cont => cont.name)
-      .includes(data.name);
-
+  const fromSubmit = data => {
+    const searchSameName = contacts.map(cont => cont.name).includes(data.name);
     if (searchSameName) {
       alert(`${data.name} is already in contacts`);
       return;
     }
-
-    this.setState(prevState => ({
-      contacts: [data, ...prevState.contacts],
-    }));
+    setContacts(prev => [data, ...prev]);
   };
 
-  deleteContact = name => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.name !== name),
-    }));
+  const deleteContact = name => {
+    setContacts(prev => prev.filter(contact => contact.name !== name));
   };
 
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value);
   };
 
-  filterContacts = contacts => {
-    const lowCaseFilter = this.state.filter.toLowerCase();
+  const filterContacts = contacts => {
+    const lowCaseFilter = filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(lowCaseFilter)
     );
   };
 
-  findSameContact = (contacts, formContact) => {
-    return contacts.map(contact => contact.include(formContact));
-  };
+  return (
+    <div className={css.app}>
+      <h1>Phone book</h1>
 
-  render() {
-    const { fromSubmit, changeFilter, filterContacts, deleteContact } = this;
-    const { filter, contacts } = this.state;
+      <Form fromSubmit={fromSubmit} />
 
-    return (
-      <div className={css.app}>
-        <h1>Phone book</h1>
-
-        <Form getFormState={fromSubmit} />
-
-        <h2>Contacts</h2>
-        <div className={css.contactsWrap}>
-          <Filter filter={filter} onChangeFilter={changeFilter} />
-          <ContactList
-            filterContacts={filterContacts(contacts)}
-            onDelete={deleteContact}
-          />
-        </div>
+      <h2>Contacts</h2>
+      <div className={css.contactsWrap}>
+        <Filter filter={filter} onChangeFilter={changeFilter} />
+        <ContactList
+          filterContacts={filterContacts(contacts)}
+          onDelete={deleteContact}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
